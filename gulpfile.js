@@ -1,13 +1,13 @@
 var gulp = require('gulp'),
-    qmuiGulpSvgSprite = require('./index.js');
+    svgSprite = require('./index.js');
 
-gulp.task('svgSprite', function () {
-    return gulp.src('test/src/svg/**/*.svg', {base: 'test/src/svg/'})
-        .pipe(qmuiGulpSvgSprite({
+gulp.task('sprite', function () {
+    return gulp.src('test/src/svg/**/*.svg')
+        .pipe(svgSprite({
             projectNamespaces: 'od',
             separator: '_',
         }))
         .pipe(gulp.dest('test/build'));
 });
 
-gulp.task('default', ['svgSprite']);
+gulp.task('default', ['sprite']);

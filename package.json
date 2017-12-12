@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "生成SVG雪碧图工具",
   "main": "index.js",
+  "repository": {
+    "url": "https://github.com/jostinsu/gulp-qmui-svg-sprite.git"
+  },
   "keywords": [
     "svg",
     "sprite",
@@ -11,7 +14,7 @@
     "css"
   ],
   "author": "jostinsu",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "gulp-util": "^3.0.8",
     "svg-sprite": "^1.3.7",

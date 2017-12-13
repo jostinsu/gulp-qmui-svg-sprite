@@ -2,44 +2,90 @@ var through = require('through2'),
     SVGSpriter	= require('svg-sprite'),
     gutil = require('gulp-util'),
     PluginError	= gutil.PluginError,
+    _ = require('lodash'),
     path = require('path');
+
 
 const PLUGIN_NAME						= 'gulp-qmui-svg-sprite';
 
 var sources = {};
-var defaultConfig = { // SVGSpriter的配置表。
-    shape: {
-        spacing: {
-            padding: 10
-        }
-    },
-    mode: {
-        css: {
-            bust: false,
-            dest: "",
-            render: {
-                css: {
-                    template: "template.css"
-                }
-            },
-            common: "common",
-            dimensions: true
-        }
-    }
-};
 
 /**
- * 获取SVGSprite的命名空间
+ * 构造svg-sprite的配置表
  *
- * @param {String} relative svg文件的相对路径
+ * @param {Object} options 用户配置的选项
+ * @param {String} spriteNameSpaces 雪碧图的命名空间
  */
-function getSpriteNameSpaces(relative) {
-    return relative.split(path.sep).slice(0, -1).map(function(step, index) {
-        if (index !== 0) {
-            return step.replace(step.charAt(0), step.charAt(0).toUpperCase());
+function makeConfig(options, spriteNameSpaces) {
+
+    var render= {};
+    if (options.stylesheet.type === "scss" || options.stylesheet.type === "css") {
+        render[options.stylesheet.type] = {
+            dest: options.stylesheet.dest.indexOf(path.sep) !== -1 ? options.stylesheet.dest : (options.stylesheet.dest + path.sep),
+            svg: options.svg.dest.indexOf(path.sep) !== -1 ? options.svg.dest : (options.svg.dest + path.sep),
+            template: options.template.path
+        };
+
+        if (options.stylesheet.type === "scss") {
+            if (!options.stylesheet.compile) {
+                render[options.stylesheet.type].dest += "_";
+            }
         }
-        return step;
-    }).join("").replace(/\s+/g, "");
+        render[options.stylesheet.type].dest += spriteNameSpaces + options.stylesheet.fileSuffix;
+        render[options.stylesheet.type].svg += spriteNameSpaces + options.svg.fileSuffix;
+
+    } else {
+        console.log("the type of stylesheet should be 'scss' or 'css'");
+    }
+
+    var classNamePrefix = "";
+    if (options.stylesheet.classNamePrefix) {
+        if (options.stylesheet.classNamePrefix.indexOf('.') === -1) {
+            classNamePrefix += '.';
+        }
+        if (options.stylesheet.classNamePrefix.charAt(options.stylesheet.classNamePrefix.length - 1) === options.stylesheet.classNameSeparator) {
+            classNamePrefix += options.stylesheet.classNamePrefix;
+        } else {
+            classNamePrefix += options.stylesheet.classNamePrefix + options.stylesheet.classNameSeparator;
+        }
+    }
+
+    var templateVariables = _.assign({
+        classNamePrefix: classNamePrefix,
+        spriteNameSpaces: spriteNameSpaces,
+        getCommonClassName: function () {
+            return function () {
+                return this.classNamePrefix + this.spriteNameSpaces
+            }
+        }
+    }, options.template.variables);
+
+    return {
+        shape: {
+            spacing: {
+                padding: 10
+            },
+            id: {
+                separator: options.stylesheet.classNameSeparator,
+                spriteNameSpaces: spriteNameSpaces,
+                generator: function(name){
+                    var svgName = name.split(path.sep).pop();
+                    return path.basename(this.spriteNameSpaces + this.separator + svgName, '.svg');
+                },
+            }
+        },
+        mode: {
+            css: {
+                bust: options.stylesheet.bust,
+                dest: "",
+                render: render,
+                prefix: classNamePrefix + "%s",
+                common: "common",
+                dimensions: true
+            }
+        },
+        variables: templateVariables
+    }
 }
 
 /**
@@ -47,7 +93,7 @@ function getSpriteNameSpaces(relative) {
  *
  * @param {Object} file svg源文件
  */
-function classification(file){
+function classification(file) {
     var pathSteps = file.relative.split(path.sep);
 
     if (pathSteps.length >= 2) {
@@ -60,6 +106,20 @@ function classification(file){
     } else {
         console.log(pathSteps.pop() + " 文件需包含在文件夹中");
     }
+
+    /**
+     * 根据文件路径构建SVGSprite的命名空间
+     *
+     * @param {String} relative svg文件的相对路径
+     */
+    function getSpriteNameSpaces(relative) {
+        return relative.split(path.sep).slice(0, -1).map(function(step, index) {
+            if (index !== 0) {
+                return step.replace(step.charAt(0), step.charAt(0).toUpperCase());
+            }
+            return step;
+        }).join("").replace(/\s+/g, "");
+    }
 }
 
 /**
@@ -67,17 +127,16 @@ function classification(file){
  *
  * @param {Object} sources 资源文件
  */
-function makeSVGSprite(sources) {
+function compileSVGSprite(options) {
     var resources = [];
 
     for(var spriteNameSpaces in sources) {
-        var sourceFiles = sources[spriteNameSpaces];
-        var shapes = 0;
+        var sourceFiles = sources[spriteNameSpaces],
+            shapes = 0,
+            config = makeConfig(options, spriteNameSpaces),
+            spriter	= new SVGSpriter(config);
 
-        defaultConfig.mode.css.render.css.dest = "css/" + spriteNameSpaces + "Sprite.css";
-        defaultConfig.mode.css.sprite = "svg/" + spriteNameSpaces + ".svg";
-        var spriter	= new SVGSpriter(defaultConfig);
-
+        //console.log(config);
         sourceFiles.forEach(function(file) {
             spriter.add(file);
             ++shapes;
@@ -105,35 +164,13 @@ function makeSVGSprite(sources) {
  */
 function gulpQmuiSvgSprite(config) {
 
-    defaultConfig.shape.id = {
-        separator: config.separator,
-        generator: function(name){
-            var svgName = name.split(path.sep).pop();
-            return path.basename(getSpriteNameSpaces(name) + this.separator + svgName, '.svg');
-        }
-    };
-    defaultConfig.mode.css.prefix = "." + config.projectNamespaces + config.separator + "%s";
-    defaultConfig.variables = {
-        projectNamespaces: config.projectNamespaces,
-        separator: config.separator,
-        getCommonClassName: function() {
-            return function() {
-                var svgFolder = this.commonName;
-                if (this.shapes.length>0) {
-                    svgFolder = this.shapes[0].base.split(this.separator).slice(0, -1).join(this.separator);
-                }
-                return "." + this.projectNamespaces + this.separator + svgFolder
-            }
-        }
-    };
-
     return through.obj(function (file, enc, cb) {
         classification(file);
         cb();
 
     }, function(cb){
         var steam = this;
-        makeSVGSprite(sources).forEach(function(file){
+        compileSVGSprite(config).forEach(function(file){
             steam.push(file);
         });
         cb()

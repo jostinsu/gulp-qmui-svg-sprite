@@ -21,17 +21,24 @@ function makeConfig(options, spriteNameSpaces) {
     var render= {};
     if (options.stylesheet.type === "scss" || options.stylesheet.type === "css") {
 
-        render[options.stylesheet.type] = {
-            dest: options.stylesheet.dest && options.stylesheet.dest.indexOf(path.sep) !== -1 ? options.stylesheet.dest : (options.stylesheet.dest + path.sep),
-            template: options.template.path || "template.scss"
-        };
-
+        var stylesheetDest = "";
+        if (options.stylesheet.dest) {
+            stylesheetDest = options.stylesheet.dest.indexOf(path.sep) !== -1 ? options.stylesheet.dest : (options.stylesheet.dest + path.sep);
+        }
         if (options.stylesheet.type === "scss") {
             if (!options.stylesheet.compile) {
-                render[options.stylesheet.type].dest += "_";
+                stylesheetDest += "_";
             }
         }
-        render[options.stylesheet.type].dest += spriteNameSpaces + options.stylesheet.fileSuffix;
+        stylesheetDest += spriteNameSpaces;
+        if (options.stylesheet.fileSuffix) {
+            stylesheetDest += options.stylesheet.fileSuffix;
+        }
+
+        render[options.stylesheet.type] = {
+            dest: stylesheetDest,
+            template: options.template.path
+        };
     } else {
         console.log("the type of stylesheet should be 'scss' or 'css'");
     }

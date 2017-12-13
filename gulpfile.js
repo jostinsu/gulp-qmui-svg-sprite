@@ -23,7 +23,6 @@ var options = {
         dest: "svg/"
     },
     template: {
-        path: "template.scss",
         variables: {}
     }
 };

@@ -22,8 +22,7 @@ function makeConfig(options, spriteNameSpaces) {
     if (options.stylesheet.type === "scss" || options.stylesheet.type === "css") {
         render[options.stylesheet.type] = {
             dest: options.stylesheet.dest.indexOf(path.sep) !== -1 ? options.stylesheet.dest : (options.stylesheet.dest + path.sep),
-            svg: options.svg.dest.indexOf(path.sep) !== -1 ? options.svg.dest : (options.svg.dest + path.sep),
-            template: options.template.path
+            template: options.template.path || "template.scss"
         };
 
         if (options.stylesheet.type === "scss") {
@@ -32,11 +31,13 @@ function makeConfig(options, spriteNameSpaces) {
             }
         }
         render[options.stylesheet.type].dest += spriteNameSpaces + options.stylesheet.fileSuffix;
-        render[options.stylesheet.type].svg += spriteNameSpaces + options.svg.fileSuffix;
-
     } else {
         console.log("the type of stylesheet should be 'scss' or 'css'");
     }
+
+    var sprite = (options.svg.dest.indexOf(path.sep) !== -1 ? options.svg.dest : (options.svg.dest + path.sep))
+                 + spriteNameSpaces
+                 + options.svg.fileSuffix;
 
     var classNamePrefix = "";
     if (options.stylesheet.classNamePrefix) {
@@ -80,6 +81,7 @@ function makeConfig(options, spriteNameSpaces) {
                 dest: "",
                 render: render,
                 prefix: classNamePrefix + "%s",
+                sprite: sprite,
                 common: "common",
                 dimensions: true
             }
@@ -136,7 +138,7 @@ function compileSVGSprite(options) {
             config = makeConfig(options, spriteNameSpaces),
             spriter	= new SVGSpriter(config);
 
-        //console.log(config);
+        console.log(config.mode.css.render);
         sourceFiles.forEach(function(file) {
             spriter.add(file);
             ++shapes;

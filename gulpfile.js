@@ -14,13 +14,13 @@ var options = {
         type: "css",
         compile: false,
         fileSuffix: "Sprite",
-        dest: "css/",
+        dest: "css",
         classNamePrefix: projectNamespaces,
         classNameSeparator: "_",
     },
     svg: {
         fileSuffix: "",
-        dest: "svg/"
+        dest: "svg"
     },
     template: {
         variables: {}

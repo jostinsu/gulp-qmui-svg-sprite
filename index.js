@@ -36,9 +36,14 @@ function makeConfig(options, spriteNameSpaces) {
         console.log("the type of stylesheet should be 'scss' or 'css'");
     }
 
-    var sprite = options.svg.dest && (options.svg.dest.indexOf(path.sep) !== -1 ? options.svg.dest : (options.svg.dest + path.sep))
-                 + spriteNameSpaces
-                 + options.svg.fileSuffix;
+    var sprite = "";
+    if(options.svg.dest) {
+        sprite += (options.svg.dest.indexOf(path.sep) !== -1 ? options.svg.dest : (options.svg.dest + path.sep))
+    }
+    sprite += spriteNameSpaces;
+    if (options.svg.fileSuffix) {
+        sprite += options.svg.fileSuffix;
+    }
 
     var classNamePrefix = "";
     if (options.stylesheet.classNamePrefix) {

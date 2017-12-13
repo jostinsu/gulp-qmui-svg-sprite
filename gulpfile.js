@@ -20,7 +20,7 @@ var options = {
     },
     svg: {
         fileSuffix: "",
-        dest: "svg"
+        dest: ""
     },
     template: {
         variables: {}

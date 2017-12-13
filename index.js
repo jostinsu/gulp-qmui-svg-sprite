@@ -19,15 +19,15 @@ var sources = {};
 function makeConfig(options, spriteNameSpaces) {
 
     var render= {};
-    if (options.stylesheet.type === "scss" || options.stylesheet.type === "css") {
+    if (options.stylesheet.type === 'scss' || options.stylesheet.type === 'css') {
 
-        var stylesheetDest = "";
+        var stylesheetDest = '';
         if (options.stylesheet.dest) {
             stylesheetDest = options.stylesheet.dest.indexOf(path.sep) !== -1 ? options.stylesheet.dest : (options.stylesheet.dest + path.sep);
         }
-        if (options.stylesheet.type === "scss") {
+        if (options.stylesheet.type === 'scss') {
             if (!options.stylesheet.compile) {
-                stylesheetDest += "_";
+                stylesheetDest += '_';
             }
         }
         stylesheetDest += spriteNameSpaces;
@@ -40,10 +40,10 @@ function makeConfig(options, spriteNameSpaces) {
             template: options.template.path
         };
     } else {
-        console.log("the type of stylesheet should be 'scss' or 'css'");
+        console.log('the type of stylesheet should be scss or css');
     }
 
-    var sprite = "";
+    var sprite = '';
     if(options.svg.dest) {
         sprite += (options.svg.dest.indexOf(path.sep) !== -1 ? options.svg.dest : (options.svg.dest + path.sep))
     }
@@ -52,7 +52,7 @@ function makeConfig(options, spriteNameSpaces) {
         sprite += options.svg.fileSuffix;
     }
 
-    var classNamePrefix = "";
+    var classNamePrefix = '';
     if (options.stylesheet.classNamePrefix) {
         if (options.stylesheet.classNamePrefix.indexOf('.') === -1) {
             classNamePrefix += '.';
@@ -91,11 +91,11 @@ function makeConfig(options, spriteNameSpaces) {
         mode: {
             css: {
                 bust: options.stylesheet.bust,
-                dest: "",
+                dest: '',
                 render: render,
-                prefix: classNamePrefix + "%s",
+                prefix: classNamePrefix + '%s',
                 sprite: sprite,
-                common: "common",
+                common: 'common',
                 dimensions: true
             }
         },
@@ -119,7 +119,7 @@ function classification(file) {
             sources[spriteNameSpaces] = [file];
         }
     } else {
-        console.log(pathSteps.pop() + " 文件需包含在文件夹中");
+        console.log(pathSteps.pop() + ' 文件需包含在文件夹中');
     }
 
     /**
@@ -133,7 +133,7 @@ function classification(file) {
                 return step.replace(step.charAt(0), step.charAt(0).toUpperCase());
             }
             return step;
-        }).join("").replace(/\s+/g, "");
+        }).join('').replace(/\s+/g, '');
     }
 }
 
@@ -151,7 +151,7 @@ function compileSVGSprite(options) {
             config = makeConfig(options, spriteNameSpaces),
             spriter	= new SVGSpriter(config);
 
-        // console.log(config.mode.css);
+        // gutil.log(config.mode.css);
         sourceFiles.forEach(function(file) {
             spriter.add(file);
             ++shapes;

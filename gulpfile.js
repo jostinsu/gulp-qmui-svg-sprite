@@ -1,28 +1,23 @@
 var gulp = require('gulp'),
-    svgSprite = require('./index.js');
-
-
-// var changeEvent = function(evt) {
-//     $.gutil.log('File', $.gutil.colors.cyan(evt.path.replace(new RegExp('/.*(?=/' + basePaths.src + ')/'), '')), 'was', $.gutil.colors.magenta(evt.type));
-// };
-
-var projectNamespaces = "ww";
+    svgSprite = require('./index.js'),
+    gutil = require('gulp-util');
 
 var options = {
     stylesheet: {
         bust: false,
-        type: "css",
+        type: 'css',
         compile: false,
-        fileSuffix: "Sprite",
-        dest: "css",
-        classNamePrefix: projectNamespaces,
-        classNameSeparator: "_",
+        fileSuffix: 'Sprite',
+        dest: 'css',
+        classNamePrefix: 'od',
+        classNameSeparator: '_'
     },
     svg: {
-        fileSuffix: "",
-        dest: ""
+        fileSuffix: '',
+        dest: 'svg'
     },
     template: {
+        path: "template.tpl",
         variables: {}
     }
 };
@@ -33,10 +28,10 @@ gulp.task('sprite', function () {
         .pipe(gulp.dest('test/build'));
 });
 
-// gulp.task('watch', function(){
-//     gulp.watch(paths.sprite.src, ['sprite']).on('change', function(evt) {
-//         changeEvent(evt);
-//     });
-// });
+gulp.task('watch', function(){
+    gulp.watch('test/src/svg/**/*.svg', ['sprite']).on('change', function(evt) {
+        gutil.log("构建SVG雪碧图")
+    });
+});
 
-gulp.task('default', ['sprite']);
+gulp.task('default', ['watch']);

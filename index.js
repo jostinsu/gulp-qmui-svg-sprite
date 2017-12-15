@@ -67,7 +67,7 @@ function makeConfig(options, spriteNameSpaces) {
     var templateVariables = _.assign({
         classNamePrefix: classNamePrefix,
         spriteNameSpaces: spriteNameSpaces,
-        spriteName: this.spriteNameSpaces + options.svg.fileSuffix + ".svg",
+        spriteName: spriteNameSpaces + options.svg.fileSuffix + ".svg",
         getCommonClassName: function () {
             return function () {
                 return this.classNamePrefix + this.spriteNameSpaces

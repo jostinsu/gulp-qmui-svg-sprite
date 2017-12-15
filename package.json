@@ -1,6 +1,6 @@
 {
   "name": "gulp-qmui-svg-sprite",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "生成SVG雪碧图工具",
   "main": "index.js",
   "repository": {

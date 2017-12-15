@@ -78,7 +78,8 @@ function makeConfig(options, spriteNameSpaces) {
     return {
         shape: {
             spacing: {
-                padding: 10
+                padding: 10,
+                box: 'padding'
             },
             id: {
                 separator: options.stylesheet.classNameSeparator,

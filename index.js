@@ -1,7 +1,5 @@
 var through = require('through2'),
     SVGSpriter	= require('svg-sprite'),
-    gutil = require('gulp-util'),
-    PluginError	= gutil.PluginError,
     _ = require('lodash'),
     path = require('path');
 
@@ -78,7 +76,7 @@ function makeConfig(options, spriteNameSpaces) {
     return {
         shape: {
             spacing: {
-                padding: 10,
+                padding: 0,
                 box: 'padding'
             },
             id: {
@@ -153,7 +151,6 @@ function compileSVGSprite(options) {
             config = makeConfig(options, spriteNameSpaces),
             spriter	= new SVGSpriter(config);
 
-        // gutil.log(config.mode.css);
         sourceFiles.forEach(function(file) {
             spriter.add(file);
             ++shapes;
